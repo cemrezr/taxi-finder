@@ -10,17 +10,18 @@ import (
 )
 
 func main() {
-	// MongoDB ile bağlantı kur
 	client, err := mongodb.NewClient("mongodb://mongodb:27017")
 	if err != nil {
-		// Hata kontrolü
 	}
 
-	// Circuit breaker'ı oluştur
 	cb := cb.NewCircuitBreaker(3, 5*time.Minute)
 
-	// HTTP sunucusunu başlat
 	r := gin.Default()
-	matching_api.SetupMatchingApiRoutes(r, client, cb) // Adjusted function call
+
+	matchingAPIKey := "driver-api-key"
+
+	//r.Use(auth.APIMiddleware(matchingAPIKey))
+
+	matching_api.SetupMatchingApiRoutes(r, client, cb, matchingAPIKey)
 	r.Run(":8081")
 }
