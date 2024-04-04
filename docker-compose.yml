@@ -9,15 +9,31 @@ services:
     volumes:
       - mongodb_data:/data/db
 
-  my-go-app:
+  driver-location-api:
     build: .
-    container_name: my-go-app
+    container_name: driver-location-api
+    command: /app/cmd/driver-location-api/main
     depends_on:
       - mongodb
     ports:
       - "8080:8080"
-    tty: true
-    stdin_open: true
+    volumes:
+      - .env:/app/.env
+    environment:
+      - API_KEY=${API_KEY}
+
+  matching-api:
+    build: .
+    container_name: matching-api
+    command: /app/cmd/matching-api/main
+    depends_on:
+      - mongodb
+    ports:
+      - "8081:8081"
+    volumes:
+      - .env:/app/.env
+    environment:
+      - API_KEY=${API_KEY}
 
 volumes:
   mongodb_data:
