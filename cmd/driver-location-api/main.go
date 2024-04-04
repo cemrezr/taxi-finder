@@ -19,9 +19,7 @@ func main() {
 
 	r := gin.Default()
 
-	driverAPIKey := "driver-api-key"
-
-	r.Use(auth.APIMiddleware(driverAPIKey))
+	r.Use(auth.APIMiddleware())
 
 	driver_api.SetupRoutes(r, client, cb)
 	r.Run(":8080")

@@ -12,14 +12,24 @@ import (
 	"taxi-finder/utils"
 )
 
-func SetupMatchingApiRoutes(r *gin.Engine, client *mongodb.Client, cb *circuitbreaker.CircuitBreaker, apiKey string) {
+func SetupMatchingApiRoutes(r *gin.Engine, client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) {
 
-	r.GET("/nearest-driver", GetNearestDriver(client, cb, apiKey))
+	r.GET("/nearest-driver", GetNearestDriver(client, cb))
 
 }
 
-func GetNearestDriver(client *mongodb.Client, cb *circuitbreaker.CircuitBreaker, apiKey string) gin.HandlerFunc {
+func GetNearestDriver(client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		apiKey, exists := c.Get("API_KEY")
+		if !exists {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "API_KEY not found in context"})
+			return
+		}
+		_, ok := apiKey.(string)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "API_KEY is not a string"})
+			return
+		}
 		var customerLocation models.GeoJSON
 		customerLatitude := c.Query("latitude")
 		customerLongitude := c.Query("longitude")
@@ -60,7 +70,7 @@ func GetNearestDriver(client *mongodb.Client, cb *circuitbreaker.CircuitBreaker,
 			return
 		}
 		req.Header.Set("Content-Type", "application/json")
-		req.Header.Set("X-API-Key", apiKey)
+		req.Header.Set("X-API-Key", apiKey.(string))
 
 		client := &http.Client{}
 		resp, err := client.Do(req)

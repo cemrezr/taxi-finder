@@ -17,6 +17,10 @@ services:
       - mongodb
     ports:
       - "8080:8080"
+    volumes:
+      - .env:/app/.env
+    environment:
+      - API_KEY=${API_KEY}
 
   matching-api:
     build: .
@@ -26,6 +30,10 @@ services:
       - mongodb
     ports:
       - "8081:8081"
+    volumes:
+      - .env:/app/.env
+    environment:
+      - API_KEY=${API_KEY}
 
 volumes:
   mongodb_data:
