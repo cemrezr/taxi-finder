@@ -46,16 +46,49 @@ JWT_SECRET: Secret key for JWT token generation (used in the matching-api).
 
 Make sure to set these variables before running the application.
 
-## Example cURL Requests
+## Example cURL Requests for Driver API
 
 ### Get All Driver
 
 ```
-curl --location --request GET 'http://localhost:8080/drivers/' \
+curl --location 'http://localhost:8080/drivers/' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: q7EJx3H8Lz9RdG5s1PfA2oKbF6cVgY4n' \
+--data ''
+```
+
+### Create Driver Location and Insert DB
+
+```
+curl --location 'http://localhost:8080/drivers/create' \
 --header 'Content-Type: application/json' \
 --header 'X-API-Key: q7EJx3H8Lz9RdG5s1PfA2oKbF6cVgY4n' \
 --data '{
-	"count": 5
+    "count" : 3
 }'
 ```
+
+### Get Driver With an ID
+
+```
+curl --location 'http://localhost:8080/drivers/d5148549-a9a8-4f94-82b3-c8f683197911' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: q7EJx3H8Lz9RdG5s1PfA2oKbF6cVgY4n' \
+--data ''
+```
+
+## Example cURL Requests for Matching API
+
+### Get Nearest Driver
+
+```
+curl --location 'http://localhost:8081/nearest-driver?latitude=41.0082&longitude=28.9784' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJhdXRoZW50aWNhdGVkIjp0cnVlfQ.bY0bTO6Krxex3CcM4VS3zOcfXffIpnML-FOPolhQ40U'
+
+```
+
+
+
+
+
 
