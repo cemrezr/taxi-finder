@@ -46,3 +46,16 @@ JWT_SECRET: Secret key for JWT token generation (used in the matching-api).
 
 Make sure to set these variables before running the application.
 
+## Example cURL Requests
+
+### Get All Driver
+
+```
+curl --location --request GET 'http://localhost:8080/drivers/' \
+--header 'Content-Type: application/json' \
+--header 'X-API-Key: q7EJx3H8Lz9RdG5s1PfA2oKbF6cVgY4n' \
+--data '{
+	"count": 5
+}'
+```
+
