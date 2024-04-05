@@ -21,7 +21,13 @@ Docker Compose
 
 ## Build and run the application using Docker Compose:
 
+```
+
+
 docker-compose up --build
+
+```
+
 
 This command will build the Docker images for the APIs and spin up the containers.
 
