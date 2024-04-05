@@ -12,7 +12,7 @@ matching-api: Matches customers with the nearest available drivers based on thei
 
 Both APIs are developed in Go and utilize MongoDB as the backend database.
 
-##Setup 
+## Setup 
 
 Ensure you have the following dependencies installed on your system:
 
@@ -30,7 +30,7 @@ Once the containers are up and running, you can access the APIs via the followin
 Driver Location API: http://localhost:8080
 Matching API: http://localhost:8081
 
-#Environment Variables
+## Environment Variables
 
 The following environment variables can be configured in the .env file:
 
