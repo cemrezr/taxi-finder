@@ -4,25 +4,27 @@ import (
 	"encoding/csv"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
+	"taxi-finder/internal/api/driver-api/database/mongodb"
 	"taxi-finder/internal/circuitbreaker"
-	"taxi-finder/internal/database/mongodb"
 	"taxi-finder/internal/models"
 	"taxi-finder/utils"
 )
 
 func SetupRoutes(r *gin.Engine, client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) {
 
-	r.GET("/drivers", GetDriversHandler(client))
-	r.GET("/drivers/:id", GetDriverByIDHandler(client))
-	r.POST("/match", MatchHandler(client, cb))
-	r.POST("/upload-drivers", UploadDriversHandler(client))
+	r.GET("/drivers", GetDrivers(client))
+	r.GET("/drivers/:id", GetDriverByID(client))
+	r.POST("/drivers/create", CreateDriverLocation(client))
+	r.POST("/match", MatchDriverAndRider(client, cb))
+	r.POST("/upload-drivers", UploadDrivers(client))
 
 }
 
-func GetDriversHandler(client *mongodb.Client) gin.HandlerFunc {
+func GetDrivers(client *mongodb.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		drivers, err := client.FindDrivers()
 		if err != nil {
@@ -34,7 +36,7 @@ func GetDriversHandler(client *mongodb.Client) gin.HandlerFunc {
 	}
 }
 
-func GetDriverByIDHandler(client *mongodb.Client) gin.HandlerFunc {
+func GetDriverByID(client *mongodb.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		driverID := c.Param("id")
 
@@ -52,7 +54,7 @@ func GetDriverByIDHandler(client *mongodb.Client) gin.HandlerFunc {
 	}
 }
 
-func UploadDriversHandler(client *mongodb.Client) gin.HandlerFunc {
+func UploadDrivers(client *mongodb.Client) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		filePath := "cmd/driver-location-api/driver_coordinates/coordinates.csv"
 
@@ -98,7 +100,7 @@ func UploadDriversHandler(client *mongodb.Client) gin.HandlerFunc {
 			drivers = append(drivers, driver)
 		}
 
-		err = client.InsertDrivers(drivers)
+		err = client.InsertDriver(drivers)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save drivers to database"})
 			return
@@ -108,7 +110,7 @@ func UploadDriversHandler(client *mongodb.Client) gin.HandlerFunc {
 	}
 }
 
-func MatchHandler(client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) gin.HandlerFunc {
+func MatchDriverAndRider(client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var customerLocation models.GeoJSON
 		if err := c.BindJSON(&customerLocation); err != nil {
@@ -139,5 +141,42 @@ func MatchHandler(client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) gin
 		})
 
 		c.JSON(http.StatusOK, nearestDriver)
+	}
+}
+
+func CreateDriverLocation(client *mongodb.Client) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var request struct {
+			Count int `json:"count"`
+		}
+		if err := c.ShouldBindJSON(&request); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+			return
+		}
+
+		if request.Count <= 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Count should be greater than zero"})
+			return
+		}
+
+		var drivers []*models.Driver
+		for i := 0; i < request.Count; i++ {
+			longitude := rand.Float64()*180 - 90
+			latitude := rand.Float64()*360 - 180
+
+			driver := &models.Driver{
+				ID:        uuid.NewString(),
+				Latitude:  latitude,
+				Longitude: longitude,
+			}
+			drivers = append(drivers, driver)
+		}
+
+		if err := client.InsertDriver(drivers); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save drivers to database"})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{"message": "Driver locations created successfully", "count": len(drivers)})
 	}
 }

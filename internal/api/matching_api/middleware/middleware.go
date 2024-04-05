@@ -1,5 +1,4 @@
-// matching-api/auth/auth.go
-package auth
+package middleware
 
 import (
 	"log"
@@ -19,26 +18,23 @@ func LoadEnvVariables() {
 	}
 }
 
-func AddAPIKeyMiddleware() gin.HandlerFunc {
+func GetAPIKey() string {
 	LoadEnvVariables()
-	apiKey := os.Getenv("API_KEY")
-
-	return func(c *gin.Context) {
-		c.Set("API_KEY", apiKey)
-		c.Next()
-	}
+	return os.Getenv("API_KEY")
 }
 
 func GetJWTSecret() []byte {
 	LoadEnvVariables()
-	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
-	return jwtSecret
+	return []byte(os.Getenv("JWT_SECRET"))
 }
 
-func JWTMiddleware() gin.HandlerFunc {
+func AuthMiddleware() gin.HandlerFunc {
+	apiKey := GetAPIKey()
 	jwtSecret := GetJWTSecret()
 
 	return func(c *gin.Context) {
+		c.Set("API_KEY", apiKey)
+
 		tokenString := strings.Replace(c.GetHeader("Authorization"), "Bearer ", "", 1)
 		if tokenString == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is missing"})
