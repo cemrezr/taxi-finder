@@ -127,11 +127,16 @@ func MatchHandler(client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) gin
 			return
 		}
 
-		nearestDriver, err := utils.FindNearestDriver(drivers, customerLocation.Coordinates[1], customerLocation.Coordinates[0])
+		nearestDriver, distance, err := utils.FindNearestDriver(drivers, customerLocation.Coordinates[1], customerLocation.Coordinates[0])
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
 			return
 		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"driver":   nearestDriver,
+			"distance": distance,
+		})
 
 		c.JSON(http.StatusOK, nearestDriver)
 	}

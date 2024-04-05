@@ -15,13 +15,17 @@ func ParseCoordinate(coord string) (float64, error) {
 	return value, nil
 }
 
+func degreesToRadians(deg float64) float64 {
+	return deg * math.Pi / 180
+}
+
 func calculateDistance(lat1, lon1, lat2, lon2 float64) float64 {
 	const earthRadius = 6371
 
-	lat1Rad := lat1 * math.Pi / 180
-	lon1Rad := lon1 * math.Pi / 180
-	lat2Rad := lat2 * math.Pi / 180
-	lon2Rad := lon2 * math.Pi / 180
+	lat1Rad := degreesToRadians(lat1)
+	lon1Rad := degreesToRadians(lon1)
+	lat2Rad := degreesToRadians(lat2)
+	lon2Rad := degreesToRadians(lon2)
 
 	deltaLat := lat2Rad - lat1Rad
 	deltaLon := lon2Rad - lon1Rad
@@ -34,9 +38,9 @@ func calculateDistance(lat1, lon1, lat2, lon2 float64) float64 {
 	return distance
 }
 
-func FindNearestDriver(drivers []*models.Driver, customerLat, customerLng float64) (*models.Driver, error) {
+func FindNearestDriver(drivers []*models.Driver, customerLat, customerLng float64) (*models.Driver, float64, error) {
 	if len(drivers) == 0 {
-		return nil, errors.New("no drivers available")
+		return nil, 0, errors.New("no drivers available")
 	}
 
 	var nearestDriver *models.Driver
@@ -50,5 +54,5 @@ func FindNearestDriver(drivers []*models.Driver, customerLat, customerLng float6
 		}
 	}
 
-	return nearestDriver, nil
+	return nearestDriver, minDistance, nil
 }
