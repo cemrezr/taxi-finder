@@ -136,11 +136,14 @@ func MatchDriverAndRider(client *mongodb.Client, cb *circuitbreaker.CircuitBreak
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"driver":   nearestDriver,
 			"distance": distance,
+			"driver": gin.H{
+				"ID":        nearestDriver.ID,
+				"Name":      nearestDriver.Name,
+				"Latitude":  nearestDriver.Latitude,
+				"Longitude": nearestDriver.Longitude,
+			},
 		})
-
-		c.JSON(http.StatusOK, nearestDriver)
 	}
 }
 
