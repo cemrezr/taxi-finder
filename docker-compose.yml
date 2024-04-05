@@ -34,6 +34,8 @@ services:
       - .env:/app/.env
     environment:
       - API_KEY=${API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+
 
 volumes:
   mongodb_data:

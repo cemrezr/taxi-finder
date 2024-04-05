@@ -1,0 +1,65 @@
+openapi: 3.0.0
+info:
+  title: Matching API
+  description: API for finding the nearest driver
+  version: 1.0.0
+servers:
+  - url: http://localhost:8081
+paths:
+  /nearest-driver:
+    get:
+      summary: Get the nearest driver
+      description: |
+        Returns the nearest driver based on the provided customer location.
+      parameters:
+        - in: query
+          name: latitude
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Customer latitude
+        - in: query
+          name: longitude
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Customer longitude
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MatchResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+components:
+  schemas:
+    MatchResponse:
+      type: object
+      properties:
+        driver_id:
+          type: string
+          description: ID of the nearest driver
+        distance:
+          type: number
+          format: float
+          description: Distance to the nearest driver
