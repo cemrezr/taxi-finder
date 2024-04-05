@@ -66,7 +66,7 @@ func (c *Client) FindDrivers() ([]*models.Driver, error) {
 	return drivers, nil
 }
 
-func (c *Client) InsertDrivers(drivers []*models.Driver) error {
+func (c *Client) InsertDriver(drivers []*models.Driver) error {
 	var documents []interface{}
 
 	for _, driver := range drivers {

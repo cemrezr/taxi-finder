@@ -7,18 +7,17 @@ import (
 	"io"
 	"net/http"
 	circuitbreaker "taxi-finder/internal/circuitbreaker"
-	"taxi-finder/internal/database/mongodb"
 	"taxi-finder/internal/models"
 	"taxi-finder/utils"
 )
 
-func SetupMatchingApiRoutes(r *gin.Engine, client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) {
+func SetupMatchingApiRoutes(r *gin.Engine, cb *circuitbreaker.CircuitBreaker) {
 
-	r.GET("/nearest-driver", GetNearestDriver(client, cb))
+	r.GET("/nearest-driver", GetNearestDriver(cb))
 
 }
 
-func GetNearestDriver(client *mongodb.Client, cb *circuitbreaker.CircuitBreaker) gin.HandlerFunc {
+func GetNearestDriver(cb *circuitbreaker.CircuitBreaker) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		apiKey, exists := c.Get("API_KEY")
 		if !exists {
