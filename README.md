@@ -44,7 +44,7 @@ API_KEY: API key required for authenticating requests to both APIs.
 
 JWT_SECRET: Secret key for JWT token generation (used in the matching-api).
 
-Make sure to set these variables before running the application.
+Make sure to set these variables before running the application. You should copy the .env.example file and rename it to .env.
 
 ## Example cURL Requests for Driver API
 
